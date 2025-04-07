@@ -45,8 +45,8 @@ int main() {
             HashTable<std::string, int, 4271> ht;
             OrderedHashTable<std::string, int, 4271> oht;
 
-            std::vector<std::string> keysHT;
-            std::vector<std::string> keysOHT;
+            std::vector<std::string> keysHT(nbElements);
+            std::vector<std::string> keysOHT(nbElements);
 
             // HashTable insertion
             auto startInsertHT = std::chrono::high_resolution_clock::now();
