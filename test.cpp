@@ -10,7 +10,8 @@
 constexpr int nbExecutions = 10;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int maxElements = 262144;
+constexpr int maxElements = 262144; // 2^18
+//constexpr int maxElements = 32768; // 2^15
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";

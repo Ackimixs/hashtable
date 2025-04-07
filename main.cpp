@@ -3,16 +3,21 @@
 #include <string>
 
 int main() {
-    OrderedHashTable<std::string, double> commandes;
+    OrderedHashTable<std::string, double, 10> commandes;
 
     // Ajout des commandes
     commandes.insert("CMD001", 25.50);
     commandes.insert("CMD002", 13.99);
     commandes.insert("CMD003", 42.10);
     commandes.insert("CMD004", 7.30);
+    commandes.insert("CMD005", 19.99);
+    commandes.insert("CMD0016", 5.75);
 
     std::cout << "Liste des commandes dans l'ordre d'arrivee :" << std::endl;
     commandes.printInOrder();
+
+    std::cout << "\nContenu de la table de hachage :" << std::endl;
+    commandes.print();
 
     // Annulation de la commande CMD002
     std::cout << "\nAnnulation de la commande CMD002..." << std::endl;
@@ -26,6 +31,9 @@ int main() {
 
     std::cout << "\nListe des commandes apres annulation :" << std::endl;
     commandes.printInOrder();
+
+    std::cout << "\nContenu de la table de hachage :" << std::endl;
+    commandes.print();
 
     return 0;
 }
