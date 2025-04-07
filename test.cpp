@@ -35,7 +35,7 @@ int main() {
     std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> valueDist(0, 1000000);
 
-    for (int nbElements = 10; nbElements <= maxElements; nbElements *= stepSize) {
+    for (int nbElements = 1; nbElements <= maxElements; nbElements *= stepSize) {
         long long totalInsertHT = 0, totalRemoveHT = 0, totalSearchHT = 0;
         long long totalInsertOHT = 0, totalRemoveOHT = 0, totalSearchOHT = 0;
         long long totalSingleInsertHT = 0, totalSingleRemoveHT = 0, totalSingleSearchHT = 0;
