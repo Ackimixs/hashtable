@@ -10,7 +10,7 @@
 constexpr int nbExecutions = 5;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int maxElements = 200000;
+constexpr int maxElements = 10000;
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";
@@ -23,9 +23,9 @@ std::string randomString(std::mt19937& rng) {
 }
 
 int main() {
-    std::ofstream fileInsert("results_insert.csv");
-    std::ofstream fileRemove("results_remove.csv");
-    std::ofstream fileSearch("results_search.csv");
+    std::ofstream fileInsert("res/results_insert.csv");
+    std::ofstream fileRemove("res/results_remove.csv");
+    std::ofstream fileSearch("res/results_search.csv");
 
     // Titres avec description plus explicite
     fileInsert << "NbElements,HashTable_Insert_ns,OrderedHashTable_Insert_ns,HashTable_Insert_s,OrderedHashTable_Insert_s,HashTable_Single_Insert_ns,OrderedHashTable_Single_Insert_ns,HashTable_Single_Insert_s,OrderedHashTable_Single_Insert_s\n";
