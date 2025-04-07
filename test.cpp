@@ -7,10 +7,10 @@
 #include "HashTable.h"
 #include "OrderedHashTable.h"
 
-constexpr int nbExecutions = 20;
+constexpr int nbExecutions = 10;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int maxElements = 100000;
+constexpr int maxElements = 262144;
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";
