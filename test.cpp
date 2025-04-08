@@ -7,12 +7,12 @@
 #include "HashTable.h"
 #include "OrderedHashTable.h"
 
-constexpr int nbExecutions = 1;
+constexpr int nbExecutions = 2 ;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int nbElemStart = 1 << 10; // 1024
+constexpr int nbElemStart = 1 << 4; // 1024
 // constexpr int maxElements = 1 << 18; // 262144
-constexpr int maxElements = 1 << 20;
+constexpr int maxElements = 1 << 19;
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";
@@ -47,8 +47,8 @@ int main() {
 
             std::cout << nbElements << " --- " << i << std::endl;
 
-            HashTable<std::string, int, 4271> ht;
-            OrderedHashTable<std::string, int, 4271> oht;
+            HashTable<std::string, int, 1000973> ht;
+            OrderedHashTable<std::string, int, 1000973> oht;
 
             std::vector<std::string> keysHT(nbElements);
             std::vector<std::string> keysOHT(nbElements);
@@ -75,9 +75,22 @@ int main() {
             auto endInsertOHT = std::chrono::high_resolution_clock::now();
             totalInsertOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endInsertOHT - startInsertOHT).count();
 
+            ht.clear();
+            oht.clear();
+
+            std::vector<std::string> keys(nbElements);
+
+            for (int j = 0; j < nbElements; ++j) {
+                std::string key = randomString(rng);
+                int value = valueDist(rng);
+                ht.insert(key, value);
+                oht.insert(key, value);
+                keys.push_back(key);
+            }
+
             // HashTable search
             auto startSearchHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keysHT) {
+            for (const auto& key : keys) {
                 int value;
                 ht.search(key, value);
             }
@@ -86,7 +99,7 @@ int main() {
 
             // OrderedHashTable search
             auto startSearchOHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keysOHT) {
+            for (const auto& key : keys) {
                 int value;
                 oht.search(key, value);
             }
@@ -134,23 +147,24 @@ int main() {
             auto endSingleRemoveOHT = std::chrono::high_resolution_clock::now();
             totalSingleRemoveOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSingleRemoveOHT - startSingleRemoveOHT).count();
 
-            // HashTable remove
-            auto startRemoveHT = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < nbElements; j+=10)
-            {
-                ht.remove(keysHT[j]);
-            }
-            auto endRemoveHT = std::chrono::high_resolution_clock::now();
-            totalRemoveHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endRemoveHT - startRemoveHT).count();
-
             // OrderedHashTable remove
             auto startRemoveOHT = std::chrono::high_resolution_clock::now();
-            for (int j = 0; j < nbElements; j+=10)
+            for (int j = nbElements-1; j > 0; j-=10)
             {
-                oht.remove(keysOHT[j]);
+                oht.remove(keys[j]);
             }
             auto endRemoveOHT = std::chrono::high_resolution_clock::now();
             totalRemoveOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endRemoveOHT - startRemoveOHT).count();
+
+
+            // HashTable remove
+            auto startRemoveHT = std::chrono::high_resolution_clock::now();
+            for (int j = nbElements-1; j > 0; j-=10)
+            {
+                ht.remove(keys[j]);
+            }
+            auto endRemoveHT = std::chrono::high_resolution_clock::now();
+            totalRemoveHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endRemoveHT - startRemoveHT).count();
         }
 
         // Calcul des moyennes et ajout des résultats dans les fichiers CSV
