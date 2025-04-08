@@ -7,11 +7,12 @@
 #include "HashTable.h"
 #include "OrderedHashTable.h"
 
-constexpr int nbExecutions = 10;
+constexpr int nbExecutions = 1;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int maxElements = 1 << 18; // 262144
-//constexpr int maxElements = 32768;
+constexpr int nbElemStart = 1 << 10; // 1024
+// constexpr int maxElements = 1 << 18; // 262144
+constexpr int maxElements = 1 << 20;
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";
@@ -36,7 +37,7 @@ int main() {
     std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> valueDist(0, 1000000);
 
-    for (int nbElements = 1; nbElements <= maxElements; nbElements *= stepSize) {
+    for (int nbElements = nbElemStart; nbElements <= maxElements; nbElements *= stepSize) {
         long long totalInsertHT = 0, totalRemoveHT = 0, totalSearchHT = 0;
         long long totalInsertOHT = 0, totalRemoveOHT = 0, totalSearchOHT = 0;
         long long totalSingleInsertHT = 0, totalSingleRemoveHT = 0, totalSingleSearchHT = 0;
@@ -135,16 +136,18 @@ int main() {
 
             // HashTable remove
             auto startRemoveHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keysHT) {
-                ht.remove(key);
+            for (int j = 0; j < nbElements; j+=10)
+            {
+                ht.remove(keysHT[j]);
             }
             auto endRemoveHT = std::chrono::high_resolution_clock::now();
             totalRemoveHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endRemoveHT - startRemoveHT).count();
 
             // OrderedHashTable remove
             auto startRemoveOHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keysOHT) {
-                oht.remove(key);
+            for (int j = 0; j < nbElements; j+=10)
+            {
+                oht.remove(keysOHT[j]);
             }
             auto endRemoveOHT = std::chrono::high_resolution_clock::now();
             totalRemoveOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endRemoveOHT - startRemoveOHT).count();
