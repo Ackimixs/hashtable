@@ -16,7 +16,7 @@ private:
     static const int TABLE_SIZE = N;
     std::vector<std::list<std::pair<T, U>>> table;
     std::list<T> insertionOrder;
-    std::unordered_map<T, typename std::list<T>::iterator> orderMap;
+    //std::unordered_map<T, typename std::list<T>::iterator> orderMap;
 
     int hashFunction(const T& key) {
         int hash = 0;
@@ -44,7 +44,7 @@ public:
         // Sinon, insérer et enregistrer l’ordre
         table[index].emplace_back(key, value);
         insertionOrder.push_back(key);
-        orderMap[key] = --insertionOrder.end();
+        //orderMap[key] = --insertionOrder.end();
     }
 
     bool search(const T& key, U& valueOut) {
@@ -64,8 +64,14 @@ public:
             if (it->first == key) {
                 table[index].erase(it);
                 // Supprimer de l’ordre d’insertion
-                insertionOrder.erase(orderMap[key]);
-                orderMap.erase(key);
+                /*insertionOrder.erase(orderMap[key]);
+                orderMap.erase(key);*/
+                for (auto orderIt = insertionOrder.begin(); orderIt != insertionOrder.end(); ++orderIt) {
+                    if (*orderIt == key) {
+                        insertionOrder.erase(orderIt);
+                        break;
+                    }
+                }
                 return true;
             }
         }
@@ -97,7 +103,7 @@ public:
     void clear() {
         table.clear();
         insertionOrder.clear();
-        orderMap.clear();
+        //orderMap.clear();
         table.resize(TABLE_SIZE);
     }
 };
