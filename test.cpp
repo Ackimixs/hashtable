@@ -7,12 +7,14 @@
 #include "HashTable.h"
 #include "OrderedHashTable.h"
 
-constexpr int nbExecutions = 2 ;
+constexpr int nbExecutions = 20;
 constexpr int keyLength = 8;
 constexpr int stepSize = 2;
-constexpr int nbElemStart = 1 << 4; // 1024
-// constexpr int maxElements = 1 << 18; // 262144
-constexpr int maxElements = 1 << 19;
+#define STEP *= stepSize
+constexpr int nbElemStart = 1 << 0;
+// constexpr int maxElements = 1 << 18;
+// constexpr int maxElements = 1 << 5;
+constexpr int maxElements = 1 << 18;
 
 std::string randomString(std::mt19937& rng) {
     static const std::string chars = "abcdefghijklmnopqrstuvwxyz";
@@ -32,23 +34,23 @@ int main() {
     // Titres avec description plus explicite
     fileInsert << "NbElements,HashTable_Insert_ns,OrderedHashTable_Insert_ns,HashTable_Insert_s,OrderedHashTable_Insert_s,HashTable_Single_Insert_ns,OrderedHashTable_Single_Insert_ns,HashTable_Single_Insert_s,OrderedHashTable_Single_Insert_s\n";
     fileRemove << "NbElements,HashTable_Remove_ns,OrderedHashTable_Remove_ns,HashTable_Remove_s,OrderedHashTable_Remove_s,HashTable_Single_Remove_ns,OrderedHashTable_Single_Remove_ns,HashTable_Single_Remove_s,OrderedHashTable_Single_Remove_s\n";
-    fileSearch << "NbElements,HashTable_Search_ns,OrderedHashTable_Search_ns,HashTable_Search_s,OrderedHashTable_Search_s,HashTable_Single_Search_ns,OrderedHashTable_Single_Search_ns,HashTable_Single_Search_s,OrderedHashTable_Single_Search_s\n";
+    fileSearch << "NbElements,HashTable_Search_ns,OrderedHashTable_Search_ns,HashTable_Search_s,OrderedHashTable_Search_s\n";
 
     std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> valueDist(0, 1000000);
 
-    for (int nbElements = nbElemStart; nbElements <= maxElements; nbElements *= stepSize) {
+    for (int nbElements = nbElemStart; nbElements <= maxElements; nbElements STEP) {
         long long totalInsertHT = 0, totalRemoveHT = 0, totalSearchHT = 0;
         long long totalInsertOHT = 0, totalRemoveOHT = 0, totalSearchOHT = 0;
-        long long totalSingleInsertHT = 0, totalSingleRemoveHT = 0, totalSingleSearchHT = 0;
-        long long totalSingleInsertOHT = 0, totalSingleRemoveOHT = 0, totalSingleSearchOHT = 0;
+        long long totalSingleInsertHT = 0, totalSingleRemoveHT = 0;
+        long long totalSingleInsertOHT = 0, totalSingleRemoveOHT = 0;
 
         for (int i = 0; i < nbExecutions; ++i) {
 
-            std::cout << nbElements << " --- " << i << std::endl;
+            //std::cout << nbElements << " --- " << i << std::endl;
 
-            HashTable<std::string, int, 1000973> ht;
-            OrderedHashTable<std::string, int, 1000973> oht;
+            HashTable<std::string, int, 49973> ht;
+            OrderedHashTable<std::string, int, 49973> oht;
 
             std::vector<std::string> keysHT(nbElements);
             std::vector<std::string> keysOHT(nbElements);
@@ -89,20 +91,16 @@ int main() {
             }
 
             // HashTable search
+            int value;
+            std::string key = keys[keys.size() / 2];
             auto startSearchHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keys) {
-                int value;
-                ht.search(key, value);
-            }
+            ht.search(key, value);
             auto endSearchHT = std::chrono::high_resolution_clock::now();
             totalSearchHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSearchHT - startSearchHT).count();
 
             // OrderedHashTable search
             auto startSearchOHT = std::chrono::high_resolution_clock::now();
-            for (const auto& key : keys) {
-                int value;
-                oht.search(key, value);
-            }
+            oht.search(key, value);
             auto endSearchOHT = std::chrono::high_resolution_clock::now();
             totalSearchOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSearchOHT - startSearchOHT).count();
 
@@ -121,19 +119,6 @@ int main() {
             oht.insert(singleKeyOHT, singleValueOHT);
             auto endSingleInsertOHT = std::chrono::high_resolution_clock::now();
             totalSingleInsertOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSingleInsertOHT - startSingleInsertOHT).count();
-
-            // Single HashTable search
-            auto startSingleSearchHT = std::chrono::high_resolution_clock::now();
-            int value;
-            ht.search(singleKeyHT, value);
-            auto endSingleSearchHT = std::chrono::high_resolution_clock::now();
-            totalSingleSearchHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSingleSearchHT - startSingleSearchHT).count();
-
-            // Single OrderedHashTable search
-            auto startSingleSearchOHT = std::chrono::high_resolution_clock::now();
-            oht.search(singleKeyOHT, value);
-            auto endSingleSearchOHT = std::chrono::high_resolution_clock::now();
-            totalSingleSearchOHT += std::chrono::duration_cast<std::chrono::nanoseconds>(endSingleSearchOHT - startSingleSearchOHT).count();
 
             // Single HashTable remove
             auto startSingleRemoveHT = std::chrono::high_resolution_clock::now();
@@ -192,11 +177,7 @@ int main() {
                    << totalSearchHT / nbExecutions << ","
                    << totalSearchOHT / nbExecutions << ","
                    << (totalSearchHT / nbExecutions) / 1e9 << ","
-                   << (totalSearchOHT / nbExecutions) / 1e9 << ","
-                   << totalSingleSearchHT / nbExecutions << ","
-                   << totalSingleSearchOHT / nbExecutions << ","
-                   << (totalSingleSearchHT / nbExecutions) / 1e9 << ","
-                   << (totalSingleSearchOHT / nbExecutions) / 1e9 << "\n";
+                   << (totalSearchOHT / nbExecutions) / 1e9 << "\n";
 
         std::cout << "nbElements = " << nbElements << " termine." << std::endl;
     }
